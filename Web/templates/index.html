@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Processing</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            color: #444;
+        }
+        h1 {
+            color: #4caf50;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .progress {
+            margin: 20px 0;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+            height: 25px;
+        }
+        .progress-bar {
+            width: 0;
+            height: 100%;
+            background-color: #4caf50;
+            text-align: center;
+            line-height: 25px;
+            color: white;
+            border-radius: 5px;
+        }
+        .status {
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload PDF for Processing</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="pdf" accept="application/pdf" required>
+        <button type="submit">Upload and Process</button>
+    </form>
+
+    <div class="progress">
+        <div class="progress-bar" id="progress-bar">0%</</div>
+    </div>
+    <div class="status" id="status">Status: Waiting for upload...</div>
+
+    <script>
+        const socket = io();
+
+        socket.on('update', (data) => {
+            const progressBar = document.getElementById('progress-bar');
+            const status = document.getElementById('status');
+
+            const percentage = (data.current / data.total) * 100;
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = Math.round(percentage) + '%';
+
+            status.textContent = `Status: ${data.status} (${data.current} of ${data.total})`;
+
+            if (data.status === 'Complete') {
+                status.innerHTML += ` - <a href="${data.link}" class="download-link">Download Log</a>`;
+                document.querySelector('.download-link').style.color = '#4caf50';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+Flask
+Flask-SocketIO
+fitz
+Pillow
+pytesseract
+opencv-python
+pandas
+Werkzeug
+PyMuPDF
+openpyxl
